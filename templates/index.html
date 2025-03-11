@@ -1,0 +1,786 @@
+{% extends "base.html" %}
+
+{% block title %}Mafia Style{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    :root {
+        --bg-dark: #0A0A0A;
+        --gold-primary: #D4AF37;
+        --gold-secondary: #B2973A;
+        --silver: #C0C0C0;
+        --accent-line: rgba(212, 175, 55, 0.15);
+    }
+
+    body {
+        background: var(--bg-dark);
+        min-height: 100vh;
+        font-family: 'Oswald', sans-serif;
+    }
+
+    /* Логотип */
+    .header-logo {
+        text-align: center;
+        padding: 2rem 0;
+        position: relative;
+        z-index: 10;
+    }
+
+    .site-logo {
+        width: 400px;
+        height: auto;
+        transition: all 0.3s ease;
+        filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.4));
+    }
+
+    .site-logo:hover {
+        transform: scale(1.02);
+        filter: drop-shadow(0 0 25px rgba(212, 175, 55, 0.6));
+    }
+
+    /* Основной контейнер */
+    .main-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem 4rem;
+    }
+
+    /* Навигация */
+    .nav-container {
+        background: linear-gradient(145deg, #111111 0%, #0A0A0A 100%);
+        border: 1px solid var(--accent-line);
+        border-radius: 12px;
+        margin: 2rem 0;
+        overflow: hidden;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+
+    .nav-links {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1px;
+        background: var(--accent-line);
+    }
+
+    .nav-button {
+        padding: 1.8rem;
+        background: #111;
+        color: var(--silver);
+        font-size: 1.1rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1.2rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-button:hover {
+        background: rgba(212, 175, 55, 0.08);
+        color: var(--gold-primary);
+    }
+
+    .nav-button i {
+        font-size: 1.4rem;
+        width: 30px;
+    }
+
+    /* Секции */
+    .section-title {
+        font-family: 'Playfair Display';
+        color: var(--gold-primary);
+        font-size: 2.2rem;
+        margin: 3rem 0 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--accent-line);
+    }
+
+    .elo-value {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: 600;
+    }
+
+    .elo-1000 { color: #ef5350; }
+    .elo-1200 { color: #66bb6a; }
+    .elo-1400 { color: #42a5f5; }
+    .elo-1600 { color: #ab47bc; }
+    .elo-1800 { color: var(--gold-primary); }
+
+    /* Таблица лидеров */
+    .table-container {
+        overflow-x: auto;
+        margin: 0 -2rem;
+        padding: 0 2rem;
+    }
+
+        /* Обновленные стили таблицы */
+    .leaderboard {
+        border: 2px solid var(--gold-primary);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 0 30px rgba(212, 175, 55, 0.1);
+    }
+
+    .leaderboard th {
+        background: linear-gradient(160deg, #1A1A1A 0%, #0D0D0D 100%);
+        border-bottom: 2px solid var(--gold-primary);
+    }
+
+    .leaderboard td {
+        border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+    }
+
+    /* Стили для топ-3 позиций */
+    .leaderboard tbody tr:nth-child(1) {
+        background: linear-gradient(90deg, rgba(212, 175, 55, 0.05) 0%, transparent 100%);
+        border-left: 4px solid var(--gold-primary);
+    }
+
+    .leaderboard tbody tr:nth-child(2) {
+        background: linear-gradient(90deg, rgba(192, 192, 192, 0.05) 0%, transparent 100%);
+        border-left: 4px solid var(--silver);
+    }
+
+    .leaderboard tbody tr:nth-child(3) {
+        background: linear-gradient(90deg, rgba(205, 127, 50, 0.05) 0%, transparent 100%);
+        border-left: 4px solid #CD7F32;
+    }
+
+    /* Иконки медалей */
+    .position-cell {
+        position: relative;
+        font-weight: bold;
+        color: var(--gold-primary);
+        font-size: 1.1em;
+    }
+
+    .position-cell::before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 45px;
+        height: 45px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        opacity: 0.2;
+    }
+
+    .leaderboard tr:nth-child(1) .position-cell::before {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23D4AF37'%3E%3Cpath d='M12 1L15 8H22L16 12L18 19L12 15L6 19L8 12L2 8H9L12 1Z'/%3E%3C/svg%3E");
+    }
+
+    .leaderboard tr:nth-child(2) .position-cell::before {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23C0C0C0'%3E%3Cpath d='M12 1L15 8H22L16 12L18 19L12 15L6 19L8 12L2 8H9L12 1Z'/%3E%3C/svg%3E");
+    }
+
+    .leaderboard tr:nth-child(3) .position-cell::before {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23CD7F32'%3E%3Cpath d='M12 1L15 8H22L16 12L18 19L12 15L6 19L8 12L2 8H9L12 1Z'/%3E%3C/svg%3E");
+    }
+
+    /* Анимация для топ-1 */
+    @keyframes glow {
+        0% { box-shadow: 0 0 10px rgba(212, 175, 55, 0.3); }
+        50% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.6); }
+        100% { box-shadow: 0 0 10px rgba(212, 175, 55, 0.3); }
+    }
+
+    .leaderboard tr:nth-child(1) {
+        animation: glow 2s ease-in-out infinite;
+        position: relative;
+    }
+
+    /* Адаптивность */
+    @media (max-width: 768px) {
+        .leaderboard tr:nth-child(n) {
+            border-left: none !important;
+        }
+
+        .position-cell::before {
+            width: 32x;
+            height: 32x;
+        }
+    }
+
+    .player-link {
+        color: inherit !important;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .player-link:hover {
+        color: var(--gold-primary) !important;
+    }
+
+    /* Карточки ролей */
+    .role-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin: 3rem 0;
+    }
+
+    .role-card {
+        padding: 2rem;
+        background: linear-gradient(145deg, #131313 0%, #0D0D0D 100%);
+        border: 1px solid;
+        border-radius: 12px;
+        min-height: 160px;
+        display: flex;
+        align-items: center;
+        gap: 4rem;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        transition: transform 0.3s ease;
+    }
+
+    .role-card:hover {
+        transform: translateY(-3px);
+    }
+
+    .role-card i {
+        font-size: 2.5rem;
+        width: 60px;
+        text-align: center;
+    }
+
+    .role-card.red { border-color: #C62828; }
+    .role-card.black { border-color: #4A4A4A; }
+    .role-card.sheriff { border-color: #2196F3; }
+    .role-card.don { border-color: #9C27B0; }
+
+    .player-name {
+        font-size: 1.3rem;
+        color: var(--gold-primary);
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+
+    .score-value {
+        font-size: 2.2rem;
+        color: var(--silver);
+        font-weight: 600;
+        margin: 0.5rem 0;
+    }
+
+    .role-card small {
+        display: block;
+        font-size: 1rem;
+        color: rgba(192, 192, 192, 0.8);
+        letter-spacing: 0.5px;
+    }
+
+    /* Секция MVP */
+    .mvp-section {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+        margin: 4rem 0;
+        position: relative;
+    }
+
+    .mvp-card {
+        padding: 2.5rem;
+        border-radius: 16px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+        background: linear-gradient(145deg, #1a1a1a 0%, #0d0d0d 100%);
+    }
+
+    /* Карточка сезона */
+    .mvp-card.season {
+        border: 2px solid rgba(33, 150, 243, 0.3);
+        box-shadow: 0 0 25px rgba(33, 150, 243, 0.1);
+    }
+
+    /* Карточка легенды */
+    .mvp-card.legend {
+        border: 2px solid rgba(212, 175, 55, 0.3);
+        box-shadow: 0 0 25px rgba(212, 175, 55, 0.1);
+    }
+
+    .mvp-card:hover {
+        transform: translateY(-5px);
+    }
+
+    /* Иконки */
+    .mvp-card i {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        display: block;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .season i {
+        color: #2196F3;
+        text-shadow: 0 0 15px rgba(33, 150, 243, 0.4);
+    }
+
+    .legend i {
+        color: var(--gold-primary);
+        text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+    }
+
+    /* Медиа-запросы */
+    @media (max-width: 1024px) {
+        .main-container {
+            padding: 0 1.5rem 3rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .site-logo {
+            width: 100%;
+            max-width: 280px;
+        }
+
+        .nav-links {
+            grid-template-columns: 1fr;
+        }
+
+        .nav-button {
+            padding: 1.2rem;
+            font-size: 1rem;
+            gap: 1rem;
+        }
+
+        .nav-button i {
+            font-size: 1.2rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            margin: 2rem 0 1.5rem;
+        }
+
+        .table-container {
+            margin: 0 -1.5rem;
+            padding: 0 1.5rem;
+        }
+
+        .leaderboard th,
+        .leaderboard td {
+            padding: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .leaderboard th:nth-child(4),
+        .leaderboard td:nth-child(4),
+        .leaderboard th:nth-child(5),
+        .leaderboard td:nth-child(5) {
+            display: none;
+        }
+
+        .role-stats-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .role-card {
+            padding: 1.5rem;
+            gap: 1.2rem;
+            min-height: auto;
+        }
+
+        .role-card i {
+            font-size: 2rem;
+            width: 40px;
+        }
+
+        .player-name {
+            font-size: 1.1rem;
+        }
+
+        .score-value {
+            font-size: 1.8rem;
+        }
+
+        .role-card small {
+            font-size: 0.9rem;
+        }
+
+        .mvp-section {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .mvp-card {
+            padding: 2rem;
+        }
+
+        .mvp-card i {
+            font-size: 2.2rem;
+        }
+
+        .mvp-card h4 {
+            font-size: 1.5rem;
+            color: var(--gold-primary);
+
+        }
+
+        .mvp-card .score-value {
+            font-size: 2rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .header-logo {
+            padding: 1.5rem 0;
+        }
+
+        .main-container {
+            padding: 0 1rem 2rem;
+        }
+
+        .nav-button {
+            padding: 1rem;
+            letter-spacing: 0.5px;
+        }
+
+        .section-title {
+            font-size: 1.6rem;
+        }
+
+        .leaderboard {
+            min-width: 400px;
+        }
+
+        .role-stats-grid {
+            gap: 1rem;
+        }
+
+        .mvp-card {
+            padding: 1.5rem;
+        }
+    }
+        .all-time-stats .role-card {
+        position: relative;
+        overflow: visible;
+    }
+
+    .all-time-stats .role-card::after {
+        content: "";
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        right: -10px;
+        bottom: -10px;
+        border-radius: 16px;
+        z-index: -1;
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    .all-time-stats .role-card:hover::after {
+        opacity: 1;
+    }
+
+    .all-time-stats .red::after {
+        background: linear-gradient(45deg, rgba(198,40,40,0.1), transparent);
+    }
+
+    .all-time-stats .black::after {
+        background: linear-gradient(45deg, rgba(74,74,74,0.1), transparent);
+    }
+
+    .all-time-stats .sheriff::after {
+        background: linear-gradient(45deg, rgba(33,150,243,0.1), transparent);
+    }
+
+    .all-time-stats .don::after {
+        background: linear-gradient(45deg, rgba(156,39,176,0.1), transparent);
+    }
+
+    /* Анимация иконок */
+    @keyframes iconFloat {
+        0% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+        100% { transform: translateY(0); }
+    }
+
+    .all-time-stats .role-card i {
+        font-size: 3rem;
+        position: relative;
+        animation: iconFloat 3s ease-in-out infinite;
+    }
+
+    .all-time-stats .role-card i::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        opacity: 0.1;
+    }
+
+    .all-time-stats .red i::after {
+        background: rgba(198,40,40,0.3);
+    }
+
+    .all-time-stats .black i::after {
+        background: rgba(74,74,74,0.3);
+    }
+
+    .all-time-stats .sheriff i::after {
+        background: rgba(33,150,243,0.3);
+    }
+
+    .all-time-stats .don i::after {
+        background: rgba(156,39,176,0.3);
+    }
+
+    /* Новые иконки */
+    .all-time-stats .red i { color: #C62828; }
+    .all-time-stats .black i { color: #4A4A4A; }
+    .all-time-stats .sheriff i { color: #2196F3; }
+    .all-time-stats .don i { color: #9C27B0; }
+
+    /* Градиентные имена */
+    .all-time-stats .player-name {
+        background: linear-gradient(45deg, var(--gold-primary), #ffffff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 700;
+    }
+
+    /* Эффект при наведении */
+    .all-time-stats .role-card:hover i {
+        animation: iconFloat 1.5s ease-in-out infinite, pulsate 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulsate {
+        0% { filter: drop-shadow(0 0 5px rgba(255,255,255,0)); }
+        50% { filter: drop-shadow(0 0 15px currentColor); }
+        100% { filter: drop-shadow(0 0 5px rgba(255,255,255,0)); }
+    }
+</style>
+
+<div class="header-logo">
+    <a href="/">
+        <img src="{{ url_for('static', filename='images/logo.png') }}"
+             alt="Mafia Style Logo"
+             class="site-logo">
+    </a>
+</div>
+
+<div class="main-container">
+    <div class="nav-container">
+        <nav class="nav-links">
+            <a href="/rating" class="nav-button">
+                <i class="fas fa-trophy"></i>
+                Рейтинг
+            </a>
+            <a href="/saved_games" class="nav-button">
+                <i class="fas fa-history"></i>
+                История
+            </a>
+            <a href="/login" class="nav-button">
+                <i class="fas fa-lock"></i>
+                Войти
+            </a>
+            <a href="/register" class="nav-button">
+                <i class="fas fa-user-plus"></i>
+                Регистрация
+            </a>
+        </nav>
+    </div>
+
+    <h2 class="section-title">Топ сезона {{ current_season }}</h2>
+    <table class="leaderboard">
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>Игрок</th>
+                <th>Рейт. балл</th>
+                <th>Winrate</th>
+                <th>ELO</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for player in top_players %}
+            <tr>
+                <td class="position-cell">{{ loop.index }}</td>
+                <td>
+                    <a href="/player/{{ player.id }}" class="player-link">
+                        {% if loop.index == 1 %}
+                        👑 {{ player.name }}
+                        {% elif loop.index == 2 %}
+                        ⚡ {{ player.name }}
+                        {% elif loop.index == 3 %}
+                        🔥 {{ player.name }}
+                        {% else %}
+                        {{ player.name }}
+                        {% endif %}
+                    </a>
+                </td>
+                <td>{{ "%.2f"|format(player.r_score) }}</td>
+                <td>{{ player.winrate|default(0.0, true) }}%</td>
+                <td>
+                    <span class="elo-value
+                        {% if player.elo < 1000 %}elo-1000
+                        {% elif player.elo < 1200 %}elo-1200
+                        {% elif player.elo < 1400 %}elo-1400
+                        {% elif player.elo < 1600 %}elo-1600
+                        {% else %}elo-1800
+                        {% endif %}">
+                        {{ player.elo }}
+                    </span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2 class="section-title">Лучшие за сезон</h2>
+    <div class="role-stats-grid">
+        <div class="season-stats">
+            <div class="role-card red">
+                <i class="fas fa-peace"></i>
+                <div>
+                    <div class="player-name">{{ season_stats['мирный']['name']|default('Нет данных', true) }}</div>
+                    <div class="score-value">
+                        {{ "%.1f"|format(season_stats['мирный']['score']|default(0.0)) }}
+                    </div>
+                    <small>Лучший красный сезона</small>
+                </div>
+            </div>
+
+            <div class="role-card black">
+                <i class="fas fa-mask"></i>
+                <div>
+                    <div class="player-name">{{ season_stats['мафия']['name']|default('Нет данных', true) }}</div>
+                    <div class="score-value">
+                        {{ "%.1f"|format(season_stats['мафия']['score']|default(0.0)) }}
+                    </div>
+                    <small>Лучший чёрный сезона</small>
+                </div>
+            </div>
+
+            <div class="role-card sheriff">
+                <i class="fas fa-shield-alt"></i>
+                <div>
+                    <div class="player-name">{{ season_stats['шериф']['name']|default('Нет данных', true) }}</div>
+                    <div class="score-value">
+                        {{ "%.1f"|format(season_stats['шериф']['score']|default(0.0)) }}
+                    </div>
+                    <small>Лучший шериф сезона</small>
+                </div>
+            </div>
+
+            <div class="role-card don">
+                <i class="fas fa-user-secret"></i>
+                <div>
+                    <div class="player-name">{{ season_stats['дон']['name']|default('Нет данных', true) }}</div>
+                    <div class="score-value">
+                        {{ "%.1f"|format(season_stats['дон']['score']|default(0.0)) }}
+                    </div>
+                    <small>Лучший дон сезона</small>
+                </div>
+            </div>
+        </div>
+        <h2 class="section-title">Легенды клуба</h2>
+        <div class="role-stats-grid">
+            <div class="all-time-stats">
+                <div class="role-card red">
+                    <i class="fas fa-user-shield"></i>
+                    <div>
+                        <div class="player-name">{{ all_time_stats['мирный']['name']|default('Нет данных', true) }}</div>
+                        <div class="score-value">
+                            {{ "%.1f"|format(all_time_stats['мирный']['score']|default(0.0)) }}
+                        </div>
+                        <small>Легенда красных</small>
+                    </div>
+                </div>
+
+                <div class="role-card black">
+                    <i class="fas fa-user-secret"></i>
+                    <div>
+                        <div class="player-name">{{ all_time_stats['мафия']['name']|default('Нет данных', true) }}</div>
+                        <div class="score-value">
+                            {{ "%.1f"|format(all_time_stats['мафия']['score']|default(0.0)) }}
+                        </div>
+                        <small>Легенда чёрных</small>
+                    </div>
+                </div>
+
+                <div class="role-card sheriff">
+                    <i class="fas fa-star-of-life"></i>
+                    <div>
+                        <div class="player-name">{{ all_time_stats['шериф']['name']|default('Нет данных', true) }}</div>
+                        <div class="score-value">
+                            {{ "%.1f"|format(all_time_stats['шериф']['score']|default(0.0)) }}
+                        </div>
+                        <small>Великий шериф</small>
+                    </div>
+                </div>
+
+                <div class="role-card don">
+                    <i class="fas fa-hat-cowboy-side"></i>
+                    <div>
+                        <div class="player-name">{{ all_time_stats['дон']['name']|default('Нет данных', true) }}</div>
+                        <div class="score-value">
+                            {{ "%.1f"|format(all_time_stats['дон']['score']|default(0.0)) }}
+                        </div>
+                        <small>Легендарный дон</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="section-title">Чемпионы</h2>
+    <div class="mvp-section">
+        <div class="mvp-card season">
+            <i class="fas fa-rocket"></i>
+            <h4>MVP Сезона {{ current_season }}</h4>
+            <div class="player-name">{{ season_mvp.name|default('Нет данных', true) }}</div>
+            <div class="score-value">{{ "%.1f"|format(season_mvp.score|default(0.0)) }}</div>
+            <small>Накопленные очки</small>
+        </div>
+        <div class="mvp-card legend">
+            <i class="fas fa-crown"></i>
+            <h4>Кто ты?!</h4>
+            <div class="player-name">{{ all_time_mvp.name|default('Нет данных', true) }}</div>
+            <div class="score-value">{{ "%.1f"|format(all_time_mvp.score|default(0.0)) }}</div>
+            <small>Всего очков за всю историю</small>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Анимация для сворачиваемых секций
+    function toggleCollapsible(header) {
+        const content = header.nextElementSibling;
+        content.style.maxHeight = content.style.maxHeight ? null : `${content.scrollHeight}px`;
+        header.querySelector('i').classList.toggle('fa-chevron-down');
+        header.querySelector('i').classList.toggle('fa-chevron-up');
+    }
+
+    // Инициализация
+    document.addEventListener('DOMContentLoaded', function() {
+        // Автоматическое открытие первого блока
+        const firstCollapsible = document.querySelector('.collapsible-header');
+        if(firstCollapsible) firstCollapsible.click();
+
+        // Плавная прокрутка
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

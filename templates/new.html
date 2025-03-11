@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Новая игра - Mafia Style</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicons/favicon.ico') }}" type="image/x-icon">
+    <style>
+        :root {
+            --bg-dark: #0A0A0A;
+            --gold-primary: #D4AF37;
+            --silver: #C0C0C0;
+            --accent-line: rgba(212, 175, 55, 0.15);
+            --loss-red: #c62828;
+        }
+
+        body {
+            font-family: 'Oswald', sans-serif;
+            background: var(--bg-dark);
+            color: var(--silver);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        h1 {
+            font-family: 'Playfair Display';
+            color: var(--gold-primary);
+            text-align: center;
+            margin: 2rem 0 3rem;
+            font-size: 2.5rem;
+        }
+
+        .controls {
+            background: rgba(15, 15, 15, 0.95);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--accent-line);
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            color: var(--silver);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .form-select, .form-control {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(30, 30, 30, 0.5);
+            border: 1px solid var(--accent-line);
+            border-radius: 8px;
+            color: var(--silver);
+            transition: all 0.3s ease;
+        }
+
+        .form-select:focus, .form-control:focus {
+            border-color: var(--gold-primary);
+            outline: none;
+            box-shadow: 0 0 12px rgba(212, 175, 55, 0.2);
+        }
+
+        .game-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(15, 15, 15, 0.95);
+            border-radius: 12px;
+            border: 1px solid var(--accent-line);
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 1.2rem;
+            text-align: left;
+            border-bottom: 1px solid var(--accent-line);
+        }
+
+        th {
+            background: rgba(30, 30, 30, 0.9);
+            color: var(--gold-primary);
+            font-weight: 500;
+        }
+
+        tr:hover td {
+            background: rgba(212, 175, 55, 0.02);
+        }
+
+        .custom-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--accent-line);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .custom-checkbox.checked {
+            background: var(--gold-primary);
+            border-color: var(--gold-primary);
+        }
+
+        .custom-checkbox.checked::after {
+            content: "✓";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--bg-dark);
+            font-weight: bold;
+        }
+
+        .btn-save {
+            width: 100%;
+            padding: 1.2rem;
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid var(--gold-primary);
+            border-radius: 8px;
+            color: var(--gold-primary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-save:hover {
+            background: rgba(212, 175, 55, 0.2);
+            transform: translateY(-2px);
+        }
+
+        #error-message {
+            background: var(--loss-red);
+            color: var(--silver);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        /* Стили для автозаполнения */
+        .ui-autocomplete {
+            background: rgba(15,15,15,0.95);
+            border: 1px solid var(--accent-line);
+            color: var(--silver);
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .ui-menu-item {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid var(--accent-line);
+            cursor: pointer;
+            font-family: 'Oswald', sans-serif;
+        }
+
+        .ui-menu-item:hover {
+            background: rgba(212,175,55,0.1);
+        }
+
+        .ui-state-focus {
+            background: rgba(212,175,55,0.2) !important;
+            border-color: transparent !important;
+            color: var(--gold-primary) !important;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .controls {
+                padding: 1.5rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            th, td {
+                padding: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .ui-autocomplete {
+                max-width: 90vw;
+            }
+        }
+        .new-player {
+            border-color: var(--loss-red) !important;
+            animation: pulseWarning 1.5s infinite;
+        }
+
+        @keyframes pulseWarning {
+            0% { box-shadow: 0 0 0 0 rgba(198,40,40,0.3); }
+            70% { box-shadow: 0 0 0 10px rgba(198,40,40,0); }
+            100% { box-shadow: 0 0 0 0 rgba(198,40,40,0); }
+        }
+
+        .confirmation-modal {
+            padding: 20px;
+            background: var(--bg-dark);
+            border: 1px solid var(--accent-line);
+            border-radius: 8px;
+        }
+
+        .confirmation-modal h3 {
+            color: var(--gold-primary);
+            margin-bottom: 15px;
+        }
+
+        .confirmation-modal ul {
+            margin: 10px 0;
+            padding-left: 20px;
+            color: var(--silver);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .confirm-btn, .cancel-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .confirm-btn {
+            background: var(--gold-primary);
+            color: var(--bg-dark);
+        }
+
+        .cancel-btn {
+            background: var(--loss-red);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>НОВАЯ ИГРА</h1>
+
+    <div class="controls">
+        <div class="form-grid">
+            <div class="form-group">
+                <label class="form-label">Победитель:</label>
+                <select id="team_victory" class="form-select">
+                    <option value="red">Красные</option>
+                    <option value="black">Чёрные</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">ПУ угадал мафий:</label>
+                <input type="number" id="pu_guess" class="form-control" min="0" max="3" value="0">
+            </div>
+            <div class="form-group">
+                <button class="btn-save" onclick="saveGame()">
+                    Сохранить игру
+                </button>
+                <div id="error-message"></div>
+            </div>
+        </div>
+    </div>
+
+    <table class="game-table">
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>Игрок</th>
+                <th>Балл</th>
+                <th>Роль</th>
+                <th>Фолы</th>
+                <th>ПУ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in range(10) %}
+            <tr class="player-row">
+                <td>{{ i+1 }}</td>
+                <td>
+                    <input type="text"
+                           class="form-control player-name autocomplete-input"
+                           required
+                           data-role-select=".role-select">
+                </td>
+                <td>
+                    <input type="number"
+                           class="form-control score-input"
+                           step="0.05"
+                           value="0.00"
+                           required>
+                </td>
+                <td>
+                    <select class="form-select role-select">
+                        <option value="мирный">Мирный</option>
+                        <option value="мафия">Мафия</option>
+                        <option value="дон">Дон</option>
+                        <option value="шериф">Шериф</option>
+                    </select>
+                </td>
+                <td><input type="number" class="form-control fouls-input" value="0" min="0"></td>
+                <td>
+                    <div class="custom-checkbox" onclick="togglePU(this)"></div>
+                    <input type="hidden" class="pu-input" value="false">
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+    <script>
+        // Автозаполнение игроков
+        $(function() {
+            $('.autocomplete-input').autocomplete({
+                source: function(request, response) {
+                    $.getJSON('/api/search_players', {
+                        term: request.term
+                    }, function(data) {
+                        response(data);
+                    });
+                },
+                minLength: 2,
+                select: function(event, ui) {
+                    const roleSelect = $(this).closest('tr').find(
+                        $(this).data('role-select')
+                    );
+                    fetchPlayerRole(ui.item.value, roleSelect);
+                }
+            });
+        });
+
+        // Получение основной роли игрока
+        function fetchPlayerRole(playerName, roleSelect) {
+            $.get(`/api/player_role/${encodeURIComponent(playerName)}`)
+                .done(function(role) {
+                    if(role) {
+                        roleSelect.val(role);
+                        roleSelect.addClass('role-highlight');
+                        setTimeout(() => {
+                            roleSelect.removeClass('role-highlight');
+                        }, 2000);
+                    }
+                });
+        }
+
+        function togglePU(element) {
+            element.classList.toggle('checked');
+            const input = element.parentElement.querySelector('.pu-input');
+            input.value = element.classList.contains('checked') ? 'true' : 'false';
+        }
+
+        async function saveGame() {
+            const errorEl = document.getElementById('error-message');
+            errorEl.style.display = 'none';
+
+            try {
+                const formData = new FormData();
+                let playerCount = 0;
+                const roles = [];
+                const newPlayers = [];
+
+                document.querySelectorAll('.player-row').forEach((row, index) => {
+                    const nameInput = row.querySelector('.player-name');
+                    const name = nameInput.value.trim();
+
+                    if(name) {
+                        playerCount++;
+                        const role = row.querySelector('.role-select').value;
+                        roles.push(role);
+
+                        // Проверка существующего игрока
+                        if(!nameInput.dataset.existing) {
+                            newPlayers.push(name);
+                        }
+
+                        formData.append(`player_${index}_name`, name);
+                        formData.append(`player_${index}_score`,
+                            parseFloat(row.querySelector('.score-input').value.replace(',', '.')) || 0);
+                        formData.append(`player_${index}_role`, role);
+                        formData.append(`player_${index}_fouls`,
+                            parseInt(row.querySelector('.fouls-input').value) || 0);
+                        formData.append(`player_${index}_pu`,
+                            row.querySelector('.pu-input').value === 'true');
+                    }
+                });
+
+                if(playerCount < 6) throw new Error('Минимум 6 игроков');
+
+
+                const donCount = roles.filter(r => r === 'дон').length;
+                const sheriffCount = roles.filter(r => r === 'шериф').length;
+                if(donCount !== 1 || sheriffCount !== 1) {
+                    throw new Error('Должен быть ровно 1 Дон и 1 Шериф');
+                }
+
+                formData.append('team_victory', document.getElementById('team_victory').value);
+                formData.append('pu_guess', document.getElementById('pu_guess').value);
+
+                const response = await fetch('/api/update_new', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if(!response.ok) throw new Error(await response.text());
+
+                const saveResponse = await fetch('/api/update_rating', {
+                    method: 'POST'
+                });
+
+                if(!saveResponse.ok) throw new Error(await saveResponse.text());
+
+                window.location.href = '/rating';
+
+            } catch (error) {
+                errorEl.textContent = error.message;
+                errorEl.style.display = 'block';
+                console.error('Ошибка:', error);
+            }
+        }
+    </script>
+</body>
+</html>
