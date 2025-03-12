@@ -80,5 +80,4 @@ desktop.ini
 *.env
 *.env.*.local
 
-storage/*
-!storage/.gitkeep
+src/config/local.py
