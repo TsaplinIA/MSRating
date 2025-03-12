@@ -5,9 +5,8 @@ import pytz
 from sqlalchemy import and_, case
 
 from src import config
-from src.infra.models import Game, GamePlayer, Player
 from src.infra.database import db
-
+from src.infra.models import Game, GamePlayer, Player
 
 logger = logging.getLogger(__name__)
 

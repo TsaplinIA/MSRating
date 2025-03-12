@@ -1,7 +1,12 @@
 from flask import Blueprint, render_template
 
 from src import config
-from src.utils.deprecated_utils import get_current_season, parse_season, calculate_role_stats, get_top_players
+from src.utils.deprecated_utils import (
+    calculate_role_stats,
+    get_current_season,
+    get_top_players,
+    parse_season,
+)
 
 home_router = Blueprint('home_router', __name__)
 

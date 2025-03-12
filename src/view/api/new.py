@@ -1,6 +1,6 @@
 import logging
 
-from flask import request, Blueprint, jsonify, session
+from flask import Blueprint, jsonify, request, session
 from flask_login import login_required
 
 new_api_router = Blueprint('new_api_router', __name__)

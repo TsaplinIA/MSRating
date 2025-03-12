@@ -1,13 +1,29 @@
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 import logging
-import pytz
 from datetime import datetime, timedelta
-from sqlalchemy import extract, and_, or_, case, asc, desc, not_, func
-from flask import session as flask_session
-from sqlalchemy.orm import aliased
 
+import pytz
+from flask import (
+    Flask,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
+from flask import session as flask_session
+from flask_login import (
+    LoginManager,
+    UserMixin,
+    current_user,
+    login_required,
+    login_user,
+    logout_user,
+)
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import and_, case
+from sqlalchemy.orm import aliased
 
 logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
@@ -183,7 +199,7 @@ def get_current_season():
         end = datetime.strptime(SEASONS[season][1], '%Y-%m-%d').date()
         if start <= current_date <= end:
             return season
-    return '2025-1' 
+    return '2025-1'
 
 def parse_season(season_str):
     if season_str == 'all':
@@ -456,7 +472,7 @@ def show_rating():
                     ],
                     else_=0.0
                 )
-            ).label('total_score'), 
+            ).label('total_score'),
             db.func.sum(case((GamePlayer.is_winner, 1), else_=0)).label('total_wins'),
             db.func.sum(case((GamePlayer.score > 0, GamePlayer.score), else_=0)).label('positive'),
             db.func.sum(case((GamePlayer.score < 0, db.func.abs(GamePlayer.score)), else_=0)).label('negative'),
@@ -492,7 +508,7 @@ def show_rating():
 
         results = query.group_by(GamePlayer.player_id).all()
 
-        
+
         table_data = []
         for res in results:
             player = res[1]
@@ -519,7 +535,7 @@ def show_rating():
                 'id': player.id,
                 'Игрок': player.name,
                 'ELO': player.elo,
-                'GG': int(gg_value), 
+                'GG': int(gg_value),
                 'Игры': total_games,
                 'Σ': round(total_score, 2),
                 'Winrate': round(win_rate * 100, 1),
@@ -529,7 +545,7 @@ def show_rating():
                 'Побед': total_wins,
                 'Доном': int(res[8] or 0),
                 'Шерифом': int(res[9] or 0),
-                'ПУ': int(pu_count), 
+                'ПУ': int(pu_count),
                 'Рейтинговый балл': round(r_score, 2)
             })
 
@@ -719,7 +735,7 @@ def handle_rating():
             game_player.elo_change = delta
             player.elo = max(150, player.elo + int(delta))
 
-            player.update_stats() 
+            player.update_stats()
 
         # Фиксируем все изменения
         db.session.commit()
@@ -768,7 +784,7 @@ def player_stats(id):
          .order_by(Game.date.desc())\
          .all()
 
-        
+
         formatted_games = []
         for game, role, score, is_winner, pu_active, fouls, elo_change in player_games:
             formatted_games.append({

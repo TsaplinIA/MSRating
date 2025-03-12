@@ -1,12 +1,12 @@
 import logging
 from datetime import datetime, timedelta
 
-from flask import render_template, Blueprint, request
-from sqlalchemy import case, and_
+from flask import Blueprint, render_template, request
+from sqlalchemy import and_, case
 
 from src import config
 from src.infra.database import db
-from src.infra.models import GamePlayer, Player, Game
+from src.infra.models import Game, GamePlayer, Player
 
 rating_router = Blueprint('rating_router', __name__)
 logger = logging.getLogger(__name__)

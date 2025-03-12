@@ -2,11 +2,11 @@ import logging
 from datetime import datetime
 
 import pytz
-from flask import Blueprint, session, jsonify, url_for
+from flask import Blueprint, jsonify, session, url_for
 from flask_login import login_required
 
 from src.infra.database import db
-from src.infra.models import Game, Player, GamePlayer
+from src.infra.models import Game, GamePlayer, Player
 
 rating_api_router = Blueprint('rating_api_router', __name__)
 logger = logging.getLogger(__name__)

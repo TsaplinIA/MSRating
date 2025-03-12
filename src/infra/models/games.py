@@ -2,6 +2,7 @@ from datetime import datetime
 
 from src.infra.database import db
 
+
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, default=datetime.utcnow)

@@ -1,10 +1,10 @@
 import logging
 
-from flask import render_template, Blueprint
+from flask import Blueprint, render_template
 from sqlalchemy.orm import aliased
 
 from src.infra.database import db
-from src.infra.models import Player, Game, GamePlayer
+from src.infra.models import Game, GamePlayer, Player
 
 logger = logging.getLogger(__name__)
 player_stats_router = Blueprint('player_stats', __name__)

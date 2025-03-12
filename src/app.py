@@ -2,8 +2,18 @@ from flask import Flask
 
 from src import config
 from src.infra.database import db
-from src.view import new_api_router, players_api_router, rating_api_router, admin_router, games_router, home_router, \
-    login_router, new_router, player_stats_router, rating_router
+from src.view import (
+    admin_router,
+    games_router,
+    home_router,
+    login_router,
+    new_api_router,
+    new_router,
+    player_stats_router,
+    players_api_router,
+    rating_api_router,
+    rating_router,
+)
 
 
 def build_flask_app():

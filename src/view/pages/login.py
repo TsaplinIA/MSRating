@@ -1,8 +1,8 @@
-from flask import request, flash, redirect, url_for, render_template, Blueprint
-from flask_login import login_required, logout_user, LoginManager, login_user
+from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask_login import LoginManager, login_required, login_user, logout_user
 
-from src.infra.database import db
 from src import config
+from src.infra.database import db
 from src.infra.models import User
 
 login_router = Blueprint('login', __name__)
