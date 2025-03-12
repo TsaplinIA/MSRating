@@ -2,13 +2,8 @@ from flask import Flask, render_template, request, jsonify, session, redirect, u
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 import logging
-import plotly.express as px
-from plotly.utils import PlotlyJSONEncoder
-import json
-from urllib.parse import unquote
 import pytz
 from datetime import datetime, timedelta
-import numpy as np
 from sqlalchemy import extract, and_, or_, case, asc, desc, not_, func
 from flask import session as flask_session
 from sqlalchemy.orm import aliased
