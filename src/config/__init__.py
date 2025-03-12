@@ -10,7 +10,7 @@ except ImportError:
     print('Not found local.py')
 
 for var in list(locals()):
-    value = os.getenv(var)
+    value = os.getenv(var) if var != 'os' else None
     if value is None:
         continue
     try:
