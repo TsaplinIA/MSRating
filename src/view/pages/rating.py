@@ -51,10 +51,18 @@ def show_rating():
                     else_=0.0
                 )
             ).label('total_score'),
-            db.func.sum(case((GamePlayer.is_winner, 1), else_=0)).label('total_wins'),
-            db.func.sum(case((GamePlayer.score > 0, GamePlayer.score), else_=0)).label('positive'),
-            db.func.sum(case((GamePlayer.score < 0, db.func.abs(GamePlayer.score)), else_=0)).label('negative'),
-            db.func.sum(case((GamePlayer.pu_active, 1), else_=0)).label('pu_count'),
+            db.func.sum(
+                case((GamePlayer.is_winner, 1), else_=0)
+            ).label('total_wins'),
+            db.func.sum(
+                case((GamePlayer.score > 0, GamePlayer.score), else_=0)
+            ).label('positive'),
+            db.func.sum(
+                case((GamePlayer.score < 0, db.func.abs(GamePlayer.score)), else_=0)
+            ).label('negative'),
+            db.func.sum(
+                case((GamePlayer.pu_active, 1), else_=0)
+            ).label('pu_count'),
             db.func.sum(
                 case(
                     (and_(GamePlayer.role == 'дон', GamePlayer.is_winner), 1),
@@ -76,7 +84,9 @@ def show_rating():
                     else_=0.0
                 )
             ).label('lh_points'),
-            db.func.sum(case((GamePlayer.role == 'мирный', 1), else_=0)).label('civilian_games')
+            db.func.sum(
+                case((GamePlayer.role == 'мирный', 1), else_=0)
+            ).label('civilian_games')
         ).select_from(GamePlayer) \
         .join(Game, GamePlayer.game_id == Game.id) \
         .join(Player, GamePlayer.player_id == Player.id)
@@ -127,7 +137,11 @@ def show_rating():
                 'Рейтинговый балл': round(r_score, 2)
             })
 
-        sorted_data = sorted(table_data, key=lambda x: x['Рейтинговый балл'], reverse=True)
+        sorted_data = sorted(
+            table_data,
+            key=lambda x: x['Рейтинговый балл'],
+            reverse=True
+        )
         for idx, item in enumerate(sorted_data):
             item['№'] = idx + 1
 

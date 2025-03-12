@@ -34,7 +34,8 @@ def build_flask_app():
         player_stats_router,
         rating_router,
     ]
-    for bp in blueprints: flask_app.register_blueprint(bp)
+    for bp in blueprints:
+        flask_app.register_blueprint(bp)
 
     return flask_app
 

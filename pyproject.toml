@@ -16,10 +16,10 @@ dependencies = [
 [tool.ruff]
 target-version = "py312"
 
-select = ["E", "F", "I", "C", "W"]
+lint.select = ["E", "F", "I", "C", "W"]
 
-ignore = []
+lint.ignore = []
 
-line-length = 88
+line-length = 120
 
-extend-ignore = []
+lint.extend-ignore = ["C901", "F403"]

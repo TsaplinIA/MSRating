@@ -91,7 +91,8 @@ def handle_rating():
             role_mod = 1.3 if data['role'] in ['дон', 'шериф'] else 1.0 if data['role'] == 'мафия' else 1.1
             score_mod = data['score']
             A = 45
-            if (game_player.pu_active and new_game.pu_guess > 1 and actual_result == 0) or (score_mod >= 0.1 and actual_result == 0):
+            if ((game_player.pu_active and new_game.pu_guess > 1 and actual_result == 0)
+                    or (score_mod >= 0.1 and actual_result == 0)):
                 s = 0
             else:
                 s = 32
