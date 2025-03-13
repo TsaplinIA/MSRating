@@ -17,6 +17,7 @@ from src.view import (
 )
 from src.view.pages.login import login_manager
 
+
 def format_datetime(value):
     moscow_tz = pytz.timezone('Europe/Moscow')
     if value.tzinfo is None:

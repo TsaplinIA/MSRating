@@ -21,6 +21,6 @@ lint.select = ["E", "F", "I", "C", "W"]
 
 lint.ignore = []
 
-line-length = 120
-
 lint.extend-ignore = ["C901", "F403"]
+
+line-length = 120
