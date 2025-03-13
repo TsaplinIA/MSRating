@@ -44,10 +44,8 @@ def show_rating():
             db.func.sum(
                 GamePlayer.score +
                 case(
-                    [
-                        (and_(GamePlayer.pu_active, Game.pu_guess == 3), 0.5),
-                        (and_(GamePlayer.pu_active, Game.pu_guess == 2), 0.25)
-                    ],
+                    (and_(GamePlayer.pu_active, Game.pu_guess == 3), 0.5),
+                        (and_(GamePlayer.pu_active, Game.pu_guess == 2), 0.25),
                     else_=0.0
                 )
             ).label('total_score'),
@@ -77,10 +75,8 @@ def show_rating():
             ).label('sheriff_wins'),
             db.func.sum(
                 case(
-                    [
-                        (and_(GamePlayer.pu_active, Game.pu_guess == 3), 0.5),
-                        (and_(GamePlayer.pu_active, Game.pu_guess == 2), 0.25)
-                    ],
+                    (and_(GamePlayer.pu_active, Game.pu_guess == 3), 0.5),
+                    (and_(GamePlayer.pu_active, Game.pu_guess == 2), 0.25),
                     else_=0.0
                 )
             ).label('lh_points'),
@@ -94,7 +90,7 @@ def show_rating():
         if start_date and end_date:
             query = query.filter(Game.date.between(start_date, end_date))
 
-        results = query.group_by(GamePlayer.player_id).all()
+        results =  query.group_by(GamePlayer.player_id, Player.id).all()
 
 
         table_data = []
