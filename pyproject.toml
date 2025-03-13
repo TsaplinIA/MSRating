@@ -9,6 +9,7 @@ dependencies = [
     "flask-login>=0.6.3",
     "flask-sqlalchemy>=3.1.1",
     "mysqlclient>=2.2.7",
+    "psycopg2-binary>=2.9.10",
     "python-dateutil>=2.9.0.post0",
     "pytz>=2025.1",
 ]
