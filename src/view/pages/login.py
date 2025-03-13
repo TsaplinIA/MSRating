@@ -5,7 +5,7 @@ from src import config
 from src.infra.database import db
 from src.infra.models import User
 
-login_router = Blueprint('login', __name__)
+login_router = Blueprint('login_router', __name__)
 login_manager = LoginManager()
 login_manager.login_view = 'login'
 
