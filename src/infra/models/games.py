@@ -1,5 +1,8 @@
 from datetime import datetime
 
+from sqlalchemy import func
+from sqlalchemy.orm import mapped_column, Mapped, relationship
+
 from src.infra.database import db
 
 
@@ -21,3 +24,18 @@ class GamePlayer(db.Model):
     is_winner = db.Column(db.Boolean, default=False)
     fouls = db.Column(db.Integer, default=0)
     elo_change = db.Column(db.Integer, default=0)
+
+class GameModel(db.Model):
+    __tablename__ = "games"
+
+    id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
+    game_datetime: Mapped[datetime] = mapped_column(db.DateTime, server_default=func.now())
+    win_team: Mapped[str] = mapped_column(db.String(16), nullable=True)
+    rs_id: Mapped[int] = mapped_column(db.Integer, db.ForeignKey('rating_scopes.id'))
+
+    rs = relationship("RatingScope", back_populates="games")
+
+class GameResult(db.Model):
+    __tablename__ = "game_results"
+
+    id: Mapped[int] = mapped_column(db.Integer, primary_key=True)

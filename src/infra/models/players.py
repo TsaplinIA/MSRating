@@ -1,3 +1,5 @@
+from sqlalchemy.orm import Mapped, mapped_column
+
 from src.infra.database import db
 from src.infra.models.games import GamePlayer
 
@@ -30,3 +32,10 @@ class Player(db.Model):
         except ZeroDivisionError:
             self.winrate = 0.0
         db.session.commit()
+
+
+class PlayerModel(db.Model):
+    __tablename__ = "players"
+
+    id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
+    nickname: Mapped[str] = mapped_column(db.String(100), unique=True, nullable=False)
