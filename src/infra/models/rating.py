@@ -1,22 +1,23 @@
+import sqlalchemy as sa
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.infra.database import db
+from src.infra.database.database import Base
 
 
-class RatingScope(db.Model):
+class RatingScope(Base):
     __tablename__ = "rating_scopes"
 
-    id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
-    name: Mapped[str] = mapped_column(db.String(256), nullable=False)
-    short_name: Mapped[str] = mapped_column(db.String(64), unique=True, nullable=False)
-    active: Mapped[bool] = mapped_column(db.Boolean, default=True, nullable=False)
+    id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(sa.String(256), nullable=False)
+    short_name: Mapped[str] = mapped_column(sa.String(64), unique=True, nullable=False)
+    active: Mapped[bool] = mapped_column(sa.Boolean, default=True, nullable=False)
 
-    games = relationship("GameModel", back_populates="rs")
+    games = relationship("GameModel", back_populates="rs", cascade="all, delete-orphan")
 
-class PlayerRating(db.Model):
+class PlayerRating(Base):
     __tablename__ = "player_ratings"
 
-    rs_id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
-    player_id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
-    total_score = db.Column(db.Float, default=0.0)
+    rs_id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
+    player_id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
+    total_score: Mapped[float] = mapped_column(sa.Float, default=0.0)
     #hash?
