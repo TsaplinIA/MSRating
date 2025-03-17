@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from src.infra.database.database import get_session
-from src.service.dto.errors import Error, PlayerNotFoundError
+from src.service.dto.errors import PlayerNotFoundError
 from src.service.players import PlayerService
 from src.service.dto.players import PlayerModelShort
 
@@ -19,7 +19,9 @@ def get_player(player_id: int, session: Session = Depends(get_session)) -> Playe
     service = PlayerService(session=session)
     player = service.get_player(id=player_id)
     print(player)
-    return player or PlayerNotFoundError(player_id)
+    if not player:
+        raise PlayerNotFoundError(player_id)
+    return player
 
 @players_router.post('', description="Create new player")
 # @api.validate(body=Request(Profile), resp=Response(HTTP_200=list[PlayerModel], HTTP_403=None), tags=['players'])
