@@ -1,8 +1,10 @@
-from src.infra.models import PlayerModel
+from flask_sqlalchemy.session import Session
+
+from src.infra.models import Player
 from src.infra.repositories.base import BaseDBRepository
 
 
-class PlayerRepository(BaseDBRepository[PlayerModel]):
-    def __init__(self, session):
-        super().__init__(session, PlayerModel)
+class PlayerRepository(BaseDBRepository[Player]):
+    def __init__(self, session: Session):
+        super().__init__(session, Player)
 
