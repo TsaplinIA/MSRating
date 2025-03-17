@@ -1,18 +1,34 @@
-from flask import Blueprint, jsonify, request
-from flask_login import login_required
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 
-from src.infra.models import Player
+from src.infra.database.database import get_session
+from src.service.dto.errors import Error, PlayerNotFoundError
+from src.service.players import PlayerService
+from src.service.dto.players import PlayerModelShort
 
-players_api_router = Blueprint('players_api_router', __name__)
+players_router = APIRouter(prefix="/players", tags=["players"], redirect_slashes=True)
 
-@players_api_router.route('/api/players')
-@login_required
-def get_players():
-    players = Player.query.with_entities(Player.name).all()
-    return jsonify([{'name': p.name} for p in players])
+@players_router.get('', description="Get all players")
+def get_players(session: Session = Depends(get_session)) -> list[PlayerModelShort]:
+    service = PlayerService(session=session)
+    players = service.get_players()
+    return players
 
-@players_api_router.route('/api/search_players')
-def search_players():
-    search_term = request.args.get('term', '')
-    players = Player.query.filter(Player.name.ilike(f'%{search_term}%')).limit(10).all()
-    return jsonify([player.name for player in players])
+@players_router.get('/{player_id}', description="Get player by ID")
+def get_player(player_id: int, session: Session = Depends(get_session)) -> PlayerModelShort:
+    service = PlayerService(session=session)
+    player = service.get_player(id=player_id)
+    print(player)
+    return player or PlayerNotFoundError(player_id)
+
+@players_router.post('', description="Create new player")
+# @api.validate(body=Request(Profile), resp=Response(HTTP_200=list[PlayerModel], HTTP_403=None), tags=['players'])
+def create_player():
+    ...
+
+@players_router.delete('/{player_id}', description="Delete player")
+def delete_player(player_id: int):
+    ...
+
+def update_player(player_id: int):
+    ...
