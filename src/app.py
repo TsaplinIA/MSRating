@@ -1,5 +1,4 @@
 from contextlib import asynccontextmanager
-
 import pytz
 import uvicorn
 from fastapi import FastAPI
@@ -8,7 +7,7 @@ from starlette.staticfiles import StaticFiles
 from src import config
 from src.infra.database.database import Base, engine
 from src.infra.logging_config import init_logging_config
-
+from src.view.api.login import login_router
 
 from src.view.api.players import players_router
 
@@ -25,19 +24,19 @@ def format_datetime(value):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI, *args, **kwargs):
-    print("FastAPI start")
+    Base.metadata.create_all(engine)
     yield
-    print("FastAPI shutdown")
+
 
 
 def init_fastapi_app():
-    Base.metadata.create_all(engine)
-    app = FastAPI(lifespan=lifespan)
+
+    app = FastAPI(lifespan=lifespan, title="MSRating", summary="API for manage MafiaStyle rating", version="0.2.1")
     init_logging_config()
 
-    app.mount("/static", StaticFiles(directory=config.STATIC_DIR.resolve()), name="js")
+    app.mount("/static", StaticFiles(directory=config.STATIC_DIR.resolve()), name="static")
     app.include_router(players_router, prefix="/api")
-
+    app.include_router(login_router, prefix="/api")
     return app
 
 
