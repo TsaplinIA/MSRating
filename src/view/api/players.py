@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 
 from src.infra.database.database import get_session
 from src.service.dto.errors import PlayerNotFoundError
-from src.service.players import PlayerService
 from src.service.dto.players import PlayerModelShort
+from src.service.players import PlayerService
 
 players_router = APIRouter(prefix="/players", tags=["players"], redirect_slashes=True)
 

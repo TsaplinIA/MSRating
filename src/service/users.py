@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 from src.infra.database.database import get_session
 from src.infra.models import User
 from src.infra.repositories.users import UserRepository
-from src.service.dto.users import UserModelShort, UserModel, LoginUserRequest
-from src.utils.hash import verify_password, hash_password
+from src.service.dto.users import LoginUserRequest, UserModel, UserModelShort
+from src.utils.hash import hash_password, verify_password
 
 
 class UserService:

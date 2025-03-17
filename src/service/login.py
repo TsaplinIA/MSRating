@@ -1,5 +1,5 @@
 from src.infra.database.database import Session
-from src.infra.login_manager import manager, AuthenticatedUserNotFoundException
+from src.infra.login_manager import AuthenticatedUserNotFoundException, manager
 from src.service.users import UserService
 
 auth_session = Session()

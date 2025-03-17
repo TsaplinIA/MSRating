@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+
 import pytz
 import uvicorn
 from fastapi import FastAPI
@@ -8,9 +9,7 @@ from src import config
 from src.infra.database.database import Base, engine
 from src.infra.logging_config import init_logging_config
 from src.view.api.login import login_router
-
 from src.view.api.players import players_router
-
 
 
 def format_datetime(value):

@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_login.exceptions import InvalidCredentialsException
 
 from src.service.dto.errors import UsernameUnavailable
-from src.service.dto.users import UserModel, LoginUserRequest, UserModelShort
+from src.service.dto.users import LoginUserRequest, UserModel, UserModelShort
 from src.service.login import login_manager
 from src.service.users import UserService
 
@@ -22,7 +22,7 @@ def login(
         raise InvalidCredentialsException
 
     access_token = login_manager.create_access_token(
-        data=dict(sub=data.username)
+        data={"sub": data.username}
     )
     return {'access_token': access_token, 'token_type': 'bearer'}
 

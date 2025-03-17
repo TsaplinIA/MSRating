@@ -5,9 +5,10 @@ from fastapi_login import LoginManager
 
 from src import config
 
+
 class NotAuthenticatedException(HTTPException):
     def __init__(self):
-        msg = f"Not Authenticated!"
+        msg = "Not Authenticated!"
         super().__init__(status_code=401, detail=msg)
 
 class AuthenticatedUserNotFoundException(HTTPException):
