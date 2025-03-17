@@ -1,10 +1,10 @@
-from flask_login import UserMixin
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.infra.database import db
+from src.infra.database.database import Base
 
 
-class User(db.Model, UserMixin):
+class User(Base):
     __tablename__ = 'users'
 
     id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
