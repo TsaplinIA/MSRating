@@ -15,8 +15,6 @@ class Game(Base):
     win_team: Mapped[str] = mapped_column(sa.String(16), nullable=True)
     rs_id: Mapped[int] = mapped_column(sa.Integer, sa.ForeignKey('rating_scopes.id'), nullable=False)
 
-    rs = relationship("RatingScope", back_populates="games", foreign_keys=[rs_id])
-
 class GameResult(Base):
     __tablename__ = "game_results"
 
