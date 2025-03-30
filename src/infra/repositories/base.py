@@ -30,3 +30,9 @@ class BaseDBRepository[T]:
             raise TypeError(f"Expected an instance of {self.model.__name__}")
         self.session.delete(obj)
         return self
+
+    def create(self, obj: T) -> Self:
+        if not isinstance(obj, self.model):
+            raise TypeError(f"Expected an instance of {self.model.__name__}")
+        self.session.add(obj)
+        return self
