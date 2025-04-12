@@ -14,6 +14,12 @@ def get_players(session: Session = Depends(get_session)) -> list[PlayerModelShor
     players = service.get_players()
     return players
 
+@players_router.get('/search', description="Get all players")
+def search_players(nickname: str, session: Session = Depends(get_session)) -> list[PlayerModelShort]:
+    service = PlayerService(session=session)
+    players = service.search_players(nickname)
+    return players
+
 @players_router.get('/{player_id}', description="Get player by ID")
 def get_player(player_id: int, session: Session = Depends(get_session)) -> PlayerModelShort:
     service = PlayerService(session=session)

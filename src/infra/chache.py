@@ -9,6 +9,10 @@ player_cache = make_region().configure(
     expiration_time=1800,
 )
 
+another_cache = make_region().configure(
+    'dogpile.cache.memory',
+    expiration_time=1800,
+)
 
 @event.listens_for(Player, 'after_insert')
 @event.listens_for(Player, 'after_update')
@@ -20,3 +24,4 @@ def invalidate_players_cache(mapper, connection, target):
 
 def invalidate_all():
     player_cache.invalidate()
+    another_cache.invalidate()

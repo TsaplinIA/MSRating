@@ -1,11 +1,12 @@
 from flask_sqlalchemy.session import Session
 from sqlalchemy.exc import IntegrityError
 
-from src.infra.chache import player_cache
+from src.infra.chache import player_cache, another_cache
 from src.infra.models import Player
 from src.infra.repositories.players import PlayerRepository
 from src.service.dto.errors import PlayerAlreadyExist
 from src.service.dto.players import PlayerModelShort
+from src.utils.textsearch import search_nicknames
 
 
 class PlayerService:
@@ -42,6 +43,18 @@ class PlayerService:
         except IntegrityError:
             self.session.rollback()
             raise PlayerAlreadyExist(nickname)
+
+    def search_players(self, search_sting: str, limit: int = 5) -> list[PlayerModelShort]:
+        @player_cache.cache_on_arguments()
+        def _build_players_map() -> dict[str, int]:
+            all_players: list[PlayerModelShort] = self.get_players()
+            return {player.nickname: player.id for player in all_players}
+        players_map = _build_players_map()
+
+        results = search_nicknames(search_sting, players_map.keys(), limit)
+
+        return [PlayerModelShort(id=players_map[nickname], nickname=nickname) for nickname in results]
+
 
     def update_player(self, **kwargs):
         ...
