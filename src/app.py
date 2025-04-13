@@ -11,6 +11,7 @@ from src.infra.logging_config import init_logging_config
 from src.view.admin import admin
 from src.view.api.login import login_router
 from src.view.api.players import players_router
+from src.view.pages.base import pages_router
 
 
 def format_datetime(value):
@@ -37,6 +38,7 @@ def init_fastapi_app():
     app.mount("/static", StaticFiles(directory=config.STATIC_DIR.resolve()), name="static")
     app.include_router(players_router, prefix="/api")
     app.include_router(login_router, prefix="/api")
+    app.include_router(pages_router)
 
     admin.mount_to(app)
 

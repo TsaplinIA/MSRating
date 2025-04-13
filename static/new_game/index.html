@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Table</title>
+    <script src="/static/js/vue.global.js"></script>
+    <link rel="stylesheet" href="/static/new_game/styles/styles.css">
+</head>
+<body>
+    <div id="app">
+        <h1>Interactive Table</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Role</th>
+                    <th>Nickname</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                <!-- Rows will be created by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Load components -->
+    <script src="/static/new_game/config/constants.js"></script>
+    <script src="/static/new_game/components/RoleSelector.js"></script>
+    <script src="/static/new_game/components/NicknameEditor.js"></script>
+    <script src="/static/new_game/components/ActionsMenu.js"></script>
+    <script src="/static/new_game/components/TableRow.js"></script>
+    <script src="/static/new_game/js/app.js"></script>
+</body>
+</html>
