@@ -11,6 +11,7 @@ class RatingScope(Base):
     name: Mapped[str] = mapped_column(sa.String(256), nullable=False)
     short_name: Mapped[str] = mapped_column(sa.String(64), unique=True, nullable=False)
     active: Mapped[bool] = mapped_column(sa.Boolean, default=True, nullable=False)
+    visible: Mapped[bool] = mapped_column(sa.Boolean, default=True, nullable=False)
 
     games = relationship("GameModel", back_populates="rs", cascade="all, delete-orphan")
 
