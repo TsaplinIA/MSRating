@@ -1,4 +1,4 @@
-from flask_sqlalchemy.session import Session
+from sqlalchemy.orm import Session
 
 from src.infra.models import User
 from src.infra.repositories.base import BaseDBRepository

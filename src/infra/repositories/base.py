@@ -1,8 +1,8 @@
 import logging
 from typing import Self
 
-from flask_sqlalchemy.session import Session
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 
