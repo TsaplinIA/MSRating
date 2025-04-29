@@ -38,18 +38,18 @@ class GameResult(Base):
     player_id: Mapped[int] = mapped_column(sa.Integer, sa.ForeignKey('players.id'), nullable=False)
     player_number: Mapped[int] = mapped_column(sa.Integer, nullable=True)
     player_role: Mapped[str] = mapped_column(sa.Enum(Role), nullable=True)
-    player_team: Mapped[str] = mapped_column(sa.Enum(Team), nullable=True)
+
     dop_ball_plus: Mapped[float] = mapped_column(sa.Float, default=0.0)
     dop_ball_minus: Mapped[float] = mapped_column(sa.Float, default=0.0)
     is_first_blood: Mapped[bool] = mapped_column(sa.Boolean, default=False)
     lh: Mapped[list[int]] = mapped_column(ARRAY(sa.SmallInteger, dimensions=1), nullable=True)
     is_kicked: Mapped[bool] = mapped_column(sa.Boolean, default=False)
     is_ppk_initiator: Mapped[bool] = mapped_column(sa.Boolean, default=False)
+
     is_has_compensation: Mapped[bool] = mapped_column(sa.Boolean, default=False)
+    player_team: Mapped[str] = mapped_column(sa.Enum(Team), nullable=True)
+    is_winner: Mapped[bool] = mapped_column(sa.Boolean, nullable=True)
     extra_info: Mapped[dict] = mapped_column(sa.JSON, nullable=True)
-
-    # Компенс, победа Итоговый балл,
-
     # Отношения
     game = relationship("Game")
     player = relationship("Player")
