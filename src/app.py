@@ -35,7 +35,6 @@ def init_fastapi_app():
     app = FastAPI(lifespan=lifespan, title="MSRating", summary="API for manage MafiaStyle rating", version="0.2.1")
     init_logging_config()
 
-    app.mount("/static", StaticFiles(directory=config.STATIC_DIR.resolve()), name="static")
     app.include_router(players_router, prefix="/api")
     app.include_router(login_router, prefix="/api")
     app.include_router(pages_router)
